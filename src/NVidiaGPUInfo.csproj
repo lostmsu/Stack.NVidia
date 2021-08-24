@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows10.0.19041</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LostTech.Stack.Widgets" Version="3.0.0-a0" />
+    <PackageReference Include="ManagedCuda-Nvml.NETStandard" Version="9.1.300" />
+  </ItemGroup>
+
+</Project>

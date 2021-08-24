@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NVidiaGPUInfo", "src\NVidiaGPUInfo.csproj", "{01BA4F96-A633-47A4-B6FB-A79D89206018}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nvgpu", "nvgpu\nvgpu.csproj", "{07AA4B91-5D1B-4D41-9CE8-9F8D53B01D59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{78E904CE-51D1-41B0-A8D4-4692E8D262E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01BA4F96-A633-47A4-B6FB-A79D89206018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01BA4F96-A633-47A4-B6FB-A79D89206018}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01BA4F96-A633-47A4-B6FB-A79D89206018}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01BA4F96-A633-47A4-B6FB-A79D89206018}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07AA4B91-5D1B-4D41-9CE8-9F8D53B01D59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07AA4B91-5D1B-4D41-9CE8-9F8D53B01D59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07AA4B91-5D1B-4D41-9CE8-9F8D53B01D59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07AA4B91-5D1B-4D41-9CE8-9F8D53B01D59}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CCFA597B-5449-41E3-8EFD-28378CAEB2AD}
+	EndGlobalSection
+EndGlobal
