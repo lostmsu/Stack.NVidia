@@ -1,6 +1,8 @@
 ﻿namespace NVidiaGPUInfo {
     using System;
+    using System.Windows;
     using System.Windows.Input;
+    using System.Windows.Threading;
 
     using LostTech.Stack.Widgets.DataBinding;
     using LostTech.Stack.Widgets.DataSources;
@@ -13,7 +15,7 @@
         static readonly nvmlReturn initResult;
         internal nvmlDevice nativeDevice;
         readonly nvmlReturn handleReturn = nvmlReturn.Success;
-        uint powerLimit;
+        readonly DispatcherTimer refreshTimer;
 
         Device(nvmlDevice nativeDevice, uint index) : this() {
             this.nativeDevice = nativeDevice;
@@ -23,14 +25,27 @@
         public uint? Index { get; }
         public DeviceUtilization Utilization { get; }
         public DeviceMemoryInfo MemoryUsage { get; }
-        public uint PowerLimitMilliwatts => this.powerLimit;
+
+        #region PowerLimitMilliwatts
+        static readonly DependencyPropertyKey PowerLimitMilliwattsKey = DependencyProperty.RegisterReadOnly(
+            nameof(PowerLimitMilliwatts),
+            typeof(uint),
+            typeof(Device),
+            new PropertyMetadata(0u));
+        public uint PowerLimitMilliwatts => (uint)this.GetValue(PowerLimitMilliwattsKey.DependencyProperty);
+        #endregion PowerLimitMilliwatts
+
         public string? Error => this.handleReturn == nvmlReturn.Success
             ? null : NvmlNativeMethods.nvmlErrorString(this.handleReturn);
 
         void RefreshInternal() {
-            var callResult = NvmlNativeMethods.nvmlDeviceGetPowerManagementLimit(this.nativeDevice, ref this.powerLimit);
+            uint powerLimit = 0;
+            var callResult = NvmlNativeMethods.nvmlDeviceGetPowerManagementLimit(this.nativeDevice, ref powerLimit);
             if (callResult != nvmlReturn.Success)
                 throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(callResult));
+            this.SetValue(PowerLimitMilliwattsKey, powerLimit);
+            this.Utilization.RefreshInternal();
+            this.MemoryUsage.RefreshInternal();
         }
 
         public static Device[] Devices {
@@ -73,6 +88,11 @@
             this.Utilization = new DeviceUtilization(this);
             this.MemoryUsage = new DeviceMemoryInfo(this);
             this.RefreshCommand = new DelegateCommand(this.RefreshInternal);
+            this.refreshTimer = new DispatcherTimer {
+                Interval = TimeSpan.FromSeconds(2),
+            };
+            this.refreshTimer.Tick += delegate { this.RefreshInternal(); };
+            this.refreshTimer.IsEnabled = true;
         }
     }
 }

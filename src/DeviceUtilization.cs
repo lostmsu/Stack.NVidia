@@ -11,7 +11,7 @@
         public uint Compute => this.utilization.gpu;
         public uint MemoryIO => this.utilization.memory;
 
-        protected override void RefreshInternal() {
+        protected internal override void RefreshInternal() {
             var callResult = NvmlNativeMethods.nvmlDeviceGetUtilizationRates(this.device.nativeDevice, ref this.utilization);
             if (callResult != nvmlReturn.Success)
                 throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(callResult));

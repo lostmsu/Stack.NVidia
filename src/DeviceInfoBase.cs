@@ -15,6 +15,6 @@
 
         public ICommand RefreshCommand { get; }
 
-        protected abstract void RefreshInternal();
+        protected internal abstract void RefreshInternal();
     }
 }
