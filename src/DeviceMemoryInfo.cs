@@ -8,33 +8,24 @@
 
         static readonly DependencyPropertyKey totalKey = DependencyProperty.RegisterReadOnly(
             nameof(TotalBytes),
-            typeof(ulong),
+            typeof(long),
             typeof(DeviceMemoryInfo),
-            new PropertyMetadata(0ul));
-        public ulong TotalBytes {
-            get => (ulong)this.GetValue(totalKey.DependencyProperty);
-            private set => this.SetValue(totalKey, value);
-        }
+            new PropertyMetadata(0L));
+        public long TotalBytes => (long)this.GetValue(totalKey.DependencyProperty);
 
         static readonly DependencyPropertyKey usedKey = DependencyProperty.RegisterReadOnly(
             nameof(UsedBytes),
-            typeof(ulong),
+            typeof(long),
             typeof(DeviceMemoryInfo),
-            new PropertyMetadata(0ul));
-        public ulong UsedBytes {
-            get => (ulong)this.GetValue(usedKey.DependencyProperty);
-            private set => this.SetValue(usedKey, value);
-        }
+            new PropertyMetadata(0L));
+        public long UsedBytes => (long)this.GetValue(usedKey.DependencyProperty);
 
         static readonly DependencyPropertyKey freeKey = DependencyProperty.RegisterReadOnly(
             nameof(FreeBytes),
-            typeof(ulong),
+            typeof(long),
             typeof(DeviceMemoryInfo),
-            new PropertyMetadata(0ul));
-        public ulong FreeBytes {
-            get => (ulong)this.GetValue(freeKey.DependencyProperty);
-            private set => this.SetValue(freeKey, value);
-        }
+            new PropertyMetadata(0L));
+        public long FreeBytes => (long)this.GetValue(freeKey.DependencyProperty);
 
         protected internal override void RefreshInternal() {
             nvmlMemory mem = default;
@@ -42,9 +33,9 @@
             if (callResult != nvmlReturn.Success)
                 throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(callResult));
 
-            this.TotalBytes = mem.total;
-            this.UsedBytes = mem.used;
-            this.FreeBytes = mem.free;
+            this.SetValue(totalKey, (long)mem.total);
+            this.SetValue(usedKey, (long)mem.used);
+            this.SetValue(freeKey, (long)mem.free);
         }
     }
 }
