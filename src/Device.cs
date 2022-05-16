@@ -14,7 +14,7 @@
     public class Device : DependencyObjectNotifyBase, IRefreshable {
         static readonly nvmlReturn initResult;
         internal nvmlDevice nativeDevice;
-        readonly nvmlReturn handleReturn = nvmlReturn.Success;
+        nvmlReturn lastError = nvmlReturn.Success;
         readonly DispatcherTimer refreshTimer;
 
         Device(nvmlDevice nativeDevice, uint index) : this() {
@@ -35,17 +35,29 @@
         public uint PowerLimitMilliwatts => (uint)this.GetValue(PowerLimitMilliwattsKey.DependencyProperty);
         #endregion PowerLimitMilliwatts
 
-        public string? Error => this.handleReturn == nvmlReturn.Success
-            ? null : NvmlNativeMethods.nvmlErrorString(this.handleReturn);
+        public string? Error => this.lastError == nvmlReturn.Success
+            ? null : NvmlNativeMethods.nvmlErrorString(this.lastError);
 
         void RefreshInternal() {
             uint powerLimit = 0;
-            var callResult = NvmlNativeMethods.nvmlDeviceGetPowerManagementLimit(this.nativeDevice, ref powerLimit);
-            if (callResult != nvmlReturn.Success)
-                throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(callResult));
+            this.lastError = NvmlNativeMethods.nvmlDeviceGetPowerManagementLimit(this.nativeDevice, ref powerLimit);
+            if (this.lastError != nvmlReturn.Success)
+                throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(this.lastError));
             this.SetValue(PowerLimitMilliwattsKey, powerLimit);
             this.Utilization.RefreshInternal();
             this.MemoryUsage.RefreshInternal();
+        }
+
+        void TryRefreshInternal() {
+            bool hadError = this.Error is not null;
+            try {
+                this.RefreshInternal();
+            } catch (InvalidOperationException) {
+                this.OnPropertyChanged(nameof(this.Error));
+                return;
+            }
+            if (hadError)
+                this.OnPropertyChanged(nameof(this.Error));
         }
 
         public static Device[] Devices {
@@ -80,18 +92,18 @@
             if (handleReturn == nvmlReturn.Success)
                 throw new InvalidOperationException();
 
-            this.handleReturn = handleReturn;
+            this.lastError = handleReturn;
             this.Index = index;
         }
 
         Device() {
             this.Utilization = new DeviceUtilization(this);
             this.MemoryUsage = new DeviceMemoryInfo(this);
-            this.RefreshCommand = new DelegateCommand(this.RefreshInternal);
+            this.RefreshCommand = new DelegateCommand(this.TryRefreshInternal);
             this.refreshTimer = new DispatcherTimer {
                 Interval = TimeSpan.FromSeconds(2),
             };
-            this.refreshTimer.Tick += delegate { this.RefreshInternal(); };
+            this.refreshTimer.Tick += delegate { this.TryRefreshInternal(); };
             this.refreshTimer.IsEnabled = true;
         }
     }
