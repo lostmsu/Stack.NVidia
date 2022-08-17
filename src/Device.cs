@@ -35,6 +35,15 @@
         public uint PowerLimitMilliwatts => (uint)this.GetValue(PowerLimitMilliwattsKey.DependencyProperty);
         #endregion PowerLimitMilliwatts
 
+        #region PowerConsumptionMilliwatts
+        static readonly DependencyPropertyKey PowerConsumptionMilliwattsKey = DependencyProperty.RegisterReadOnly(
+            nameof(PowerConsumptionMilliwatts),
+            typeof(uint),
+            typeof(Device),
+            new PropertyMetadata(0u));
+        public uint PowerConsumptionMilliwatts => (uint)this.GetValue(PowerConsumptionMilliwattsKey.DependencyProperty);
+        #endregion PowerConsumptionMilliwatts
+
         public string? Error => this.lastError == nvmlReturn.Success
             ? null : NvmlNativeMethods.nvmlErrorString(this.lastError);
 
@@ -46,6 +55,11 @@
             this.SetValue(PowerLimitMilliwattsKey, powerLimit);
             this.Utilization.RefreshInternal();
             this.MemoryUsage.RefreshInternal();
+            uint power = 0;
+            this.lastError = NvmlNativeMethods.nvmlDeviceGetPowerUsage(this.nativeDevice, ref power);
+            if (this.lastError != nvmlReturn.Success)
+                throw new InvalidOperationException(NvmlNativeMethods.nvmlErrorString(this.lastError));
+            this.SetValue(PowerConsumptionMilliwattsKey, power);
         }
 
         void TryRefreshInternal() {
